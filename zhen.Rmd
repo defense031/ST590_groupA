@@ -1,0 +1,39 @@
+---
+title: "Project 1-Group A"
+author: "Zhen Jiang"
+date: "Sep. 28, 2018"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 1
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# What is JSON data, where does it get used, and why is it a good way to store data?
+## 
+
+# Possible packages/functions (pros/cons) that are available for reading JSON data into R. Choose one and explain why you’ve chosen it. 
+## Possible packages for reading JSON data into R
+1, The rjson package.
+   We can use this package for reading in JSON files in R.
+
+2, The fromJSON function in the rjson package.
+   Pros: We can use this function to easily read in JSON files into R as a list and change it into any data type we want later.
+   Cons: when using this function, we can only readin JSON files as list in R, and will have to convert it into atomic vector, data frame, or matrix using as... functions.
+   
+3, The jsonlite package.
+   Pros: Implements a bidirectional mapping between JSON data and the most important R data types. Thereby we can convert between R objects and JSON without loss of type or information, and without the need for any manual data munging.
+   Cons:
+
+4, The fromJSON function in the jsonlite package.
+   Pros: converts JSON arrays automatically into different types of R objects.
+   This function has 3 arguments which control the converting process: simplifyVector, simplifyDataFrame and simplifyMatrix for converting JSON data into atomic vector, data frame, and matrix in R separately.
+   cons: need to provide more arguments when using the function to determine what kind of data type we want in R.
+ 
+
+# Give an example where you read in a JSON file and summarize that data set.
+##
