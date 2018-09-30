@@ -68,9 +68,11 @@ getTypes <- function(df){
 }
 
 newcolumns <-apply(Pokedf,1,getTypes)
+newcolumns[is.na(newcolumns)] <- 0
 newcolumns <- t(newcolumns)
 colnames(newcolumns) <- c("Type1","Type2")
 Pokedf <- cbind(Pokedf,newcolumns)
+table(Pokedf$Type1,Pokedf$Type2)
 ```
 
 **show the name & candy column as well as the new variable**  
