@@ -73,5 +73,7 @@ b<-ggplot(PokeCandy, aes(x=candy, y=spawn_chance))
 b+geom_boxplot(fill="gold1")+
 geom_jitter()+
 labs(x="Candy Type", title="Boxplot of spawn chance by candy type")+
-ylab("Spawn Chance")
+ylab("Spawn Chance")+
+theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+
 ```
