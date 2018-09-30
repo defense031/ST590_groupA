@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # What is JSON data, where does it get used, and why is it a good way to store data?
 ## 
+JSON, short for Javascript Object Notation, is a data format represented as a string that can be used to store ordered lists or name-value pairs. It is intuitive for humans and understood by many computer languages, despite its origins in Javascript. It is used most regularly in data interchange, or the transfer of structured information between servers and web applications. Vectors and arrays in JSON format are represented with square brackets and comma delimiters, while objects or name-value pairs use curly brackets and comma delimiters. Compared to the comma separated values format, JSON is better at showing hierarchical data and is easy to use with better data reading programs than Microsoft Excel. Compared to XML, JSON is smaller, faster for computers to read, and more intuitive for humans to look at raw. Since many web-based applications are coded using Javascript, at least one end of the channel will natively understand JSON, making it a convenient format for data interchange.
 
 # Possible packages/functions (pros/cons) that are available for reading JSON data into R. Choose one and explain why you’ve chosen it. 
 ## Possible packages for reading JSON data into R
