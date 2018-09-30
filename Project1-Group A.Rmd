@@ -59,7 +59,7 @@ Pokedf <- poke$pokemon
 ```{r}
 PokeCandy<-group_by(Pokedf,candy)%>%mutate(AvgSpawnChance=mean(spawn_chance))
 ```
-## custom function
+## contingency table
 ```{r}
 getTypes <- function(df){
   Typeuno <- (unlist(df[5])[1])
