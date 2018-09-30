@@ -1,7 +1,7 @@
 ---
 title: "Project 1-Group A"
 author: "Zhen Jiang, Christian Ramsland, Austin Semmel"
-date: "Sep. 28, 2018"
+date: "Sep.28, 2018"
 output:
   html_document:
     toc: yes
@@ -42,6 +42,8 @@ load libraries
 ```{r message=FALSE}
 library(jsonlite)
 library(dplyr)
+library(ggplot2)
+library(dplyr)
 ```
 
 ## read in a json file
@@ -59,3 +61,11 @@ show the name & candy column as well as the new variable
 select(PokeCandy, name, candy, AvgSpawnChance)
 ```
 
+## create a box plot
+```{r}
+b<-ggplot(PokeCandy, aes(x=candy, y=spawn_chance))
+b+geom_boxplot(fill="gold1")+
+geom_jitter()+
+labs(x="Candy Type", title="Boxplot of spawn chance by candy type")+
+ylab("Spawn Chance")
+```
