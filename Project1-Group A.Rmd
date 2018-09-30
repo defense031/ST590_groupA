@@ -17,28 +17,29 @@ knitr::opts_chunk$set(echo = TRUE)
 ## 
 
 # Possible packages/functions (pros/cons) that are available for reading JSON data into R. Choose one and explain why you’ve chosen it. 
-1, The rjson package.
-   We can use this package for reading in JSON files in R.
-
-2, The fromJSON function in the rjson package.
-   See this [link](https://www.tutorialspoint.com/r/r_json_files.htm)
-   Pros: We can use this function to easily read in JSON files into R as a list and change it into any data type we want later.
-   Cons: when using this function, we can only readin JSON files as list in R, and will have to convert it into atomic vector, data frame, or matrix using as... functions.
+**1, The rjson package.**  
+   We can use this package for reading in JSON files in R.  
    
-3, The jsonlite package.
-   See this [link](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html)
-   Pros: Implements a bidirectional mapping between JSON data and the most important R data types. Thereby we can convert between R objects and JSON without loss of type or information, and without the need for any manual data munging.
+**2, The fromJSON function in the rjson package.**  
+   See this [link](https://www.tutorialspoint.com/r/r_json_files.htm).  
+   **Pros:** We can use this function to easily read in JSON files into R as a list and change it into any data type we want later.  
+   **Cons:** when using this function, we can only readin JSON files as list in R, and will have to convert it into atomic vector, data frame, or matrix using as... functions.  
+      
+**3, The jsonlite package.**  
+   See this [link](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html).  
+   **Pros:** Implements a bidirectional mapping between JSON data and the most important R data types. Thereby we can convert between R objects and JSON without loss of type or information, and without the need for any manual data munging.  
    
-4, The fromJSON function in the jsonlite package.
-   Pros: converts JSON arrays automatically into different types of R objects.
-   This function has 3 arguments which control the converting process: simplifyVector, simplifyDataFrame and simplifyMatrix for converting JSON data into atomic vector, data frame, and matrix in R separately.
-   cons: need to provide more arguments when using the function to determine what kind of data type we want in R.
+**4, The fromJSON function in the jsonlite package.**  
+   **Pros:** converts JSON arrays automatically into different types of R objects.  
+   This function has 3 arguments which control the converting process: simplifyVector, simplifyDataFrame and simplifyMatrix for converting JSON data into atomic vector, data frame, and matrix in R separately.  
+   **Cons:** need to provide more arguments when using the function to determine what kind of data type we want in R.  
 
-We would like to choose fromJSON() function from the jsonlite package, because we can read in the json data and convert it to the data type we want at the same time.
- 
+We would like to choose `fromJSON()` function from the jsonlite package, because we can read in the json data and convert it to the data type we want at the same time.  
 
-# Give an example where you read in a JSON file and summarize that data set.
-load libraries
+# Give an example where you read in a JSON file and summarize that data set.  
+
+**Load libraries.**  
+
 ```{r message=FALSE}
 library(jsonlite)
 library(dplyr)
@@ -46,22 +47,27 @@ library(ggplot2)
 library(dplyr)
 ```
 
-## read in a json file
+## read in a json file  
+
 ```{r}
 poke <- fromJSON("https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json",simplifyDataFrame = TRUE)
 Pokedf <- poke$pokemon
 ```
 
-## create a new variable: avg_spawn_chance, which represents the average spawn chance for each candy type
+## create a new variable: avg_spawn_chance, which represents the average spawn chance for each candy type  
+
 ```{r}
 PokeCandy<-group_by(Pokedf,candy)%>%mutate(AvgSpawnChance=mean(spawn_chance))
 ```
-show the name & candy column as well as the new variable
+
+**show the name & candy column as well as the new variable**  
+
 ```{r}
 select(PokeCandy, name, candy, AvgSpawnChance)
 ```
 
-## create a box plot
+## create a box plot  
+
 ```{r}
 b<-ggplot(PokeCandy, aes(x=candy, y=spawn_chance))
 b+geom_boxplot(fill="gold1")+
