@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# What is JSON data, where does it get used, and why is it a good way to store data? 
+# What is JSON data, where does it get used, and why is it a good way to store data?
 ## 
 
 # Possible packages/functions (pros/cons) that are available for reading JSON data into R. Choose one and explain why you’ve chosen it. 
