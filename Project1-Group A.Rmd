@@ -93,4 +93,6 @@ theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
 
 ```
 ## create a scatter plot (not finished yet, I want type1 to be the color but I'm stuck on the factors)
+```{r}
 ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(gsub("m","",Pokedf[,6]))))) + geom_point()
+```
