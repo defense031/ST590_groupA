@@ -1,0 +1,19 @@
+---
+title: "tentativejsondf"
+author: "Christian Ramsland"
+date: "September 29, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r cars}
+library(jsonlite)
+poke <- fromJSON("https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json",simplifyDataFrame = TRUE)
+Pokedf <- poke$pokemon
+```
+
+
