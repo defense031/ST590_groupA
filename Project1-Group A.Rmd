@@ -59,6 +59,19 @@ Pokedf <- poke$pokemon
 ```{r}
 PokeCandy<-group_by(Pokedf,candy)%>%mutate(AvgSpawnChance=mean(spawn_chance))
 ```
+## custom function
+```{r}
+getTypes <- function(df){
+  Typeuno <- (unlist(df[5])[1])
+  Typedos <- (unlist(df[5])[2])
+  Typesdf <- c(Typeuno,Typedos)
+}
+
+newcolumns <-apply(Pokedf,1,getTypes)
+newcolumns <- t(newcolumns)
+colnames(newcolumns) <- c("Type1","Type2")
+Pokedf <- cbind(Pokedf,newcolumns)
+```
 
 **show the name & candy column as well as the new variable**  
 
