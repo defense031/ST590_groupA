@@ -13,11 +13,14 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# What is JSON data, where does it get used, and why is it a good way to store data?
-## 
-JSON, short for Javascript Object Notation, is a data format represented as a string that can be used to store ordered lists or name-value pairs. It is intuitive for humans and understood by many computer languages, despite its origins in Javascript. It is used most regularly in data interchange, or the transfer of structured information between servers and web applications. Vectors and arrays in JSON format are represented with square brackets and comma delimiters, while objects or name-value pairs use curly brackets and comma delimiters. Compared to the comma separated values format, JSON is better at showing hierarchical data and is easy to use with better data reading programs than Microsoft Excel. Compared to XML, JSON is smaller, faster for computers to read, and more intuitive for humans to look at raw. Since many web-based applications are coded using Javascript, at least one end of the channel will natively understand JSON, making it a convenient format for data interchange.  
 
-# Possible packages/functions (pros/cons) that are available for reading JSON data into R. Choose one and explain why you’ve chosen it. 
+# What is JSON data, where does it get used, and why is it a good way to store data.
+## 
+**_JSON_**, short for Javascript Object Notation, is a data format represented as a string that can be used to store ordered lists or name-value pairs. It is intuitive for humans and understood by many computer languages, despite its origins in Javascript.  
+It is used most regularly in data interchange, or the transfer of structured information between servers and web applications. Vectors and arrays in JSON format are represented with square brackets and comma delimiters, while objects or name-value pairs use curly brackets and comma delimiters.  
+Compared to the comma separated values format, JSON is better at showing hierarchical data and is easy to use with better data reading programs than Microsoft Excel. Compared to XML, JSON is smaller, faster for computers to read, and more intuitive for humans to look at raw. Since many web-based applications are coded using Javascript, at least one end of the channel will natively understand JSON, making it a convenient format for data interchange.  
+
+# Possible packages/functions (pros/cons) that are available for reading JSON data into R.  
 **1, The rjson package.**  
    We can use this package for reading in JSON files in R.  
    
@@ -37,38 +40,44 @@ JSON, short for Javascript Object Notation, is a data format represented as a st
 
 We would like to choose `fromJSON()` function from the jsonlite package, because we can read in the json data and convert it to the data type we want at the same time.  
 
-# Give an example where you read in a JSON file and summarize that data set.
-## Description of Dataset and where it was found.
-This dataset comes from a github library of various JSON formatted files. It is based on data for the game Pokemon Go, and contains information about the original 151 Pokemon.
+# Example of reading in a JSON file & summarize the data set.
+## Description of the dataset.
+This dataset comes from a github library of various JSON formatted files.  
+It is based on data for the game Pokemon Go, and contains information about the original 151 Pokemon.  
+
+## Read in the json file  
 
 **Load libraries.**  
-
 ```{r message=FALSE}
 library(jsonlite)
-library(dplyr)
-library(ggplot2)
-library(tidyr)
 ```
 
-## Read in a json file  
-
+**Read in the json file**
 ```{r}
 poke <- fromJSON("https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json",simplifyDataFrame = TRUE)
 Pokedf <- poke$pokemon
 ```
 
-## Create a new variable: avg_spawn_chance, which represents the average spawn chance for each candy type  
+## Create a new variable:  
+**New variable: avg_spawn_chance. This represents the average spawn chance for each candy type.**  
+
+**Load libraries.**  
+```{r message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
 
 ```{r}
 PokeCandy<-group_by(Pokedf,candy)%>%mutate(AvgSpawnChance=mean(spawn_chance))
 ```
-**Show the name & candy column as well as the new variable**  
 
+**Show the name & candy column as well as the new variable**  
 ```{r}
 select(PokeCandy, name, candy, AvgSpawnChance)
 ```
 
-## create a custom function & Contingency table
+## Create a function & contingency table
 ```{r}
 getTypes <- function(df){
   type1 <- (unlist(df[5])[1])
@@ -85,7 +94,9 @@ Pokedf <- data.frame(lapply(Pokedf,as.character),stringsAsFactors = FALSE)
 table(Pokedf$type1,Pokedf$type2)
 ```
 
-## Numeric Summary: summary of Average Spawns
+## Numeric Summaries:  
+
+**Numeric summary of Average Spawns by primary pokemon type.**
 ```{r}
 avgSpawnSummary = c()
 typevector <- c("Normal","Grass","Flying","Poison","Electric","Ground","Fire","Water","Dragon","Ice","Ghost","Psychic","Rock","Bug","Fighting")
@@ -95,7 +106,7 @@ avgSpawnSummary <- cbind(typevector,(matrix(avgSpawnSummary, ncol = 6, byrow = T
 colnames(avgSpawnSummary) <- c("Type","Min.","1st Qu.","Median","Mean","3rd Qu.","Max.")
 ```
 
-##Numeric summary: Find mean of spawn chance by type
+**Numeric summary of mean of spawn chance by pokemon type.**
 ```{r}
 #Create list of unique types
 types<-unique(Pokedf$type1)
@@ -113,25 +124,31 @@ for (i in types){
 as_tibble(sumData)
 ```
 
-## create a bar plot 
+## Create a bar plot:  
+**Bar plot showing means of average spawns for each pokemon type.**
 ```{r}
-
+dfAvgSpawnSummary<-as.data.frame(avgSpawnSummary)
+p<-ggplot(dfAvgSpawnSummary, aes(x=Type, y=Mean))
+p+geom_bar(stat="identity", fill="blue")+
+labs(x="Type", title="Barplot of mean average spawns by pokemon type")+
+ylab("Mean of average spawns")+
+theme(axis.text.x=element_text(angle=90))
 ```
 
 
-## Create a box plot  
-
+## Create a box plot:  
+**Box plot showing spawn chance for each candy type taken by pokemon.**  
 ```{r}
 b<-ggplot(PokeCandy, aes(x=candy, y=spawn_chance))
 b+geom_boxplot(fill="gold1")+
 geom_jitter()+
 labs(x="Candy Type", title="Boxplot of spawn chance by candy type")+
 ylab("Spawn Chance")+
-theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
-
+theme(axis.text.x=element_text(angle=90,hjust=1, vjust=0.5))
 ```
 
-## Create a scatter plot use height as response and weight as variable, colored by the primary type.
+## Create a scatter plot:  
+**Scatter plot showing height vs weight, colored by the primary pokemon type.**
 ```{r}
 ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(gsub("m","",Pokedf[,6]))),color = type1)) + geom_point()+labs(x="weight (kg)",y="height (m)",color = "Main Type", title = "Pokemon Height and Weight with Primary Typing")
 
