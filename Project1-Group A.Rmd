@@ -37,7 +37,9 @@ JSON, short for Javascript Object Notation, is a data format represented as a st
 
 We would like to choose `fromJSON()` function from the jsonlite package, because we can read in the json data and convert it to the data type we want at the same time.  
 
-# Give an example where you read in a JSON file and summarize that data set.  
+# Give an example where you read in a JSON file and summarize that data set.
+## Description of Dataset and where it was found.
+This dataset comes from a github library of various JSON formatted files. It is based on data for the game Pokemon Go, and contains information about the original 151 Pokemon.
 
 **Load libraries.**  
 
@@ -83,29 +85,17 @@ Pokedf <- data.frame(lapply(Pokedf,as.character),stringsAsFactors = FALSE)
 table(Pokedf$type1,Pokedf$type2)
 ```
 
-## create numeric summaries by some of your categorical variables  
-
-## create a bar plot  
-
-## Create a box plot  
-
+## Numeric Summary: summary of Average Spawns
 ```{r}
-b<-ggplot(PokeCandy, aes(x=candy, y=spawn_chance))
-b+geom_boxplot(fill="gold1")+
-geom_jitter()+
-labs(x="Candy Type", title="Boxplot of spawn chance by candy type")+
-ylab("Spawn Chance")+
-theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
-
+avgSpawnSummary = c()
+typevector <- c("Normal","Grass","Flying","Poison","Electric","Ground","Fire","Water","Dragon","Ice","Ghost","Psychic","Rock","Bug","Fighting")
+for (i in typevector){
+  avgSpawnSummary <- c(avgSpawnSummary,(summary(as.numeric((filter(Pokedf,(type1==i)|(type2==i)))$avg_spawns))))}
+avgSpawnSummary <- cbind(typevector,(matrix(avgSpawnSummary, ncol = 6, byrow = TRUE)))
+colnames(avgSpawnSummary) <- c("Type","Min.","1st Qu.","Median","Mean","3rd Qu.","Max.")
 ```
 
-## Create a scatter plot
-```{r}
-ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(gsub("m","",Pokedf[,6]))),color = Type1)) + geom_point()+labs(x="weight (kg)",y="height (m)",color = "Main Type", title = "Pokemon Height and Weight with Primary Typing")
-
-```
-
-##Find mean of spawn chance by type
+##Numeric summary: Find mean of spawn chance by type
 ```{r}
 #Create list of unique types
 types<-unique(Pokedf$type1)
@@ -123,11 +113,26 @@ for (i in types){
 as_tibble(sumData)
 ```
 
-
+## create a bar plot 
 ```{r}
-###getting there...
 
 ```
 
 
+## Create a box plot  
 
+```{r}
+b<-ggplot(PokeCandy, aes(x=candy, y=spawn_chance))
+b+geom_boxplot(fill="gold1")+
+geom_jitter()+
+labs(x="Candy Type", title="Boxplot of spawn chance by candy type")+
+ylab("Spawn Chance")+
+theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+
+```
+
+## Create a scatter plot use height as response and weight as variable, colored by the primary type.
+```{r}
+ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(gsub("m","",Pokedf[,6]))),color = type1)) + geom_point()+labs(x="weight (kg)",y="height (m)",color = "Main Type", title = "Pokemon Height and Weight with Primary Typing")
+
+```
