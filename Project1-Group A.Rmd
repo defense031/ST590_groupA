@@ -36,7 +36,9 @@ JSON, short for Javascript Object Notation, is a data format represented as a st
 
 We would like to choose `fromJSON()` function from the jsonlite package, because we can read in the json data and convert it to the data type we want at the same time.  
 
-# Give an example where you read in a JSON file and summarize that data set.  
+# Give an example where you read in a JSON file and summarize that data set.
+## Description of Dataset and where it was found.
+This dataset comes from a github library of various JSON formatted files. It is based on data for the game Pokemon Go, and contains information about the original 151 Pokemon.
 
 **Load libraries.**  
 
@@ -75,6 +77,16 @@ colnames(newCols) <- c("type1","type2")
 Pokedf <- cbind(Pokedf,newCols)
 Pokedf <- data.frame(lapply(Pokedf,as.character),stringsAsFactors = FALSE)
 table(Pokedf$type1,Pokedf$type2)
+```
+
+## Numeric Summary of Average Spawns
+```{r}
+avgSpawnSummary = c()
+typevector <- c("Normal","Grass","Flying","Poison","Electric","Ground","Fire","Water","Dragon","Ice","Ghost","Psychic","Rock","Bug","Fighting")
+for (i in typevector){
+  avgSpawnSummary <- c(avgSpawnSummary,(summary(as.numeric((filter(Pokedf,(Type1)%in%(i)|(Type2)%in%(i)))$avg_spawns))))}
+avgSpawnSummary <- cbind(typevector,(matrix(avgSpawnSummary, ncol = 6, byrow = TRUE)))
+colnames(avgSpawnSummary) <- c("Type","Min.","1st Qu.","Median","Mean","3rd Qu.","Max.")
 ```
 
 **Show the name & candy column as well as the new variable**  
