@@ -44,44 +44,45 @@ We would like to choose `fromJSON()` function from the jsonlite package, because
 library(jsonlite)
 library(dplyr)
 library(ggplot2)
-library(dplyr)
+library(tidyr)
 ```
 
-## read in a json file  
+## Read in a json file  
 
 ```{r}
 poke <- fromJSON("https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json",simplifyDataFrame = TRUE)
 Pokedf <- poke$pokemon
 ```
 
-## create a new variable: avg_spawn_chance, which represents the average spawn chance for each candy type  
+## Create a new variable: avg_spawn_chance, which represents the average spawn chance for each candy type  
 
 ```{r}
 PokeCandy<-group_by(Pokedf,candy)%>%mutate(AvgSpawnChance=mean(spawn_chance))
 ```
-## contingency table
+
+## Contingency table
 ```{r}
 getTypes <- function(df){
-  Typeuno <- (unlist(df[5])[1])
-  Typedos <- (unlist(df[5])[2])
-  Typesdf <- c(Typeuno,Typedos)
+  type1 <- (unlist(df[5])[1])
+  type2 <- (unlist(df[5])[2])
+  Typesdf <- c(type1,type2)
 }
 
-newcolumns <-apply(Pokedf,1,getTypes)
-newcolumns[is.na(newcolumns)] <- 0
-newcolumns <- t(newcolumns)
-colnames(newcolumns) <- c("Type1","Type2")
-Pokedf <- cbind(Pokedf,newcolumns)
-table(Pokedf$Type1,Pokedf$Type2)
+newCols <-apply(Pokedf,1,getTypes)
+newCols[is.na(newCols)] <- 0
+newCols <- t(newCols)
+colnames(newCols) <- c("type1","type2")
+Pokedf <- cbind(Pokedf,newCols)
+table(Pokedf$type1,Pokedf$type2)
 ```
 
-**show the name & candy column as well as the new variable**  
+**Show the name & candy column as well as the new variable**  
 
 ```{r}
 select(PokeCandy, name, candy, AvgSpawnChance)
 ```
 
-## create a box plot  
+## Create a box plot  
 
 ```{r}
 b<-ggplot(PokeCandy, aes(x=candy, y=spawn_chance))
@@ -92,7 +93,34 @@ ylab("Spawn Chance")+
 theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
 
 ```
-## create a scatter plot (not finished yet, I want type1 to be the color but I'm stuck on the factors)
+## Create a scatter plot (not finished yet, I want type1 to be the color but I'm stuck on the factors)
 ```{r}
 ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(gsub("m","",Pokedf[,6]))))) + geom_point()
 ```
+
+##Find mean of spawn chance by type
+```{r}
+#Create list of unique types
+types<-unique(Pokedf$type1)
+
+#Initialize dataframe to capture mean values
+sumData<-data.frame(matrix(ncol=14,nrow=1))
+colnames(sumData)<-as.character(types)
+
+#Find mean spawn chance for each type
+for (i in types){
+  newDF<-filter(Pokedf,(type1==i)|(type2==i))
+  sumData[i]<-mean(as.numeric(newDF$spawn_chance))
+  
+}
+as_tibble(sumData)
+```
+
+
+```{r}
+###getting there...
+
+```
+
+
+
