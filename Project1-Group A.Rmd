@@ -73,6 +73,7 @@ newCols[is.na(newCols)] <- 0
 newCols <- t(newCols)
 colnames(newCols) <- c("type1","type2")
 Pokedf <- cbind(Pokedf,newCols)
+Pokedf <- data.frame(lapply(Pokedf,as.character),stringsAsFactors = FALSE)
 table(Pokedf$type1,Pokedf$type2)
 ```
 
@@ -93,9 +94,9 @@ ylab("Spawn Chance")+
 theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
 
 ```
-## Create a scatter plot (not finished yet, I want type1 to be the color but I'm stuck on the factors)
+## Create a scatter plot
 ```{r}
-ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(gsub("m","",Pokedf[,6]))))) + geom_point()
+ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(gsub("m","",Pokedf[,6]))),color = Type1)) + geom_point()
 ```
 
 ##Find mean of spawn chance by type
