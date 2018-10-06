@@ -153,3 +153,15 @@ theme(axis.text.x=element_text(angle=90,hjust=1, vjust=0.5))
 ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(gsub("m","",Pokedf[,6]))),color = type1)) + geom_point()+labs(x="weight (kg)",y="height (m)",color = "Main Type", title = "Pokemon Height and Weight with Primary Typing")
 
 ```
+
+## Group D ("Amanda, Adil & Brian") - Project 1b:
+## Reading JSON Data:
+```{r Read}
+library(jsonlite)
+library(dplyr)
+# Reading in json data from the web
+digital <- fromJSON("https://www4.stat.ncsu.edu/~post/558/datasets/russian_ads.json",simplifyDataFrame = TRUE)
+digital <- tbl_df(digital)
+
+```
+
