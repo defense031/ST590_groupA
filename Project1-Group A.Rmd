@@ -203,3 +203,11 @@ digital_tb_unnest$language_categories
 
 ```
 
+```{r}
+#first attempt at some aggregation
+library(ggplot2)
+digital_dropna<-digital_tb_unnest %>% drop_na(ad_spend_usd) %>% drop_na(ad_impressions)
+g<-ggplot(digital_dropna, aes(x=ad_spend_usd, y=conversion_rate))
+g+geom_point()
+```
+
