@@ -159,9 +159,47 @@ ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(g
 ```{r Read}
 library(jsonlite)
 library(dplyr)
-# Reading in json data from the web
-digital <- fromJSON("https://www4.stat.ncsu.edu/~post/558/datasets/russian_ads.json",simplifyDataFrame = TRUE)
-digital <- tbl_df(digital)
+library(tidyr)
+digital <- fromJSON("https://www4.stat.ncsu.edu/~post/558/datasets/russian_ads.json", flatten = TRUE)
+str(digital)
+
+# As you look closer you would notice the first 4 columns (variables) are ‘list’ data type and they are ‘nested’. This is because each ‘categories’ columns include an JS array data object in the original JSON data.
+# For Example (Look at the middle bracket[])
+
+# "language_categories": [
+#       "Not Specified"
+#     ],
+#     "placement_categories": [
+#       "Facebook"
+#     ],
+#     "interests_categories": [],
+#     "location_categories": [
+#       "Midwest",
+#       "Atlantic"
+#     ]
+
+# So even after the flattening the data, this type of variables are registered as ‘list’ data type and it has a list of the values (or atomic vector) for each row of the data frame. You can easily show the values inside of this type of variable by using as.character() function like below.
+
+# Convert to tibble
+digital_tb <- as_data_frame(digital)
+
+# As an example
+digital_tb %>% dplyr::mutate(location_categories = as.character(location_categories)) %>% dplyr::select(location_categories)
+
+# To break out ‘categories’ list columns and create one row for each value, we can use ‘unnest()’ function from tidyr package.
+
+# unnest the first 2 columns
+digital_tb_unnest <- digital_tb %>% unnest(language_categories, .drop = FALSE) %>% unnest(placement_categories, .drop = FALSE)
+
+digital_tb_unnest$language_categories
+
+# Unnested columns are at the end of the dataset
+
+# Because the 3rd and 4th columns contain character(0), i.e. empty data points, these 2 columns can't be unnested by default unnest(). Otherwise, it drop all the rows with empty data points.
+
+# We can use the regex version of interests and locations_categories, and use detect string functions for aggregation
+# or try to unnest the rows without empty points and left join back to the mother dataset digital_tb
+# More to be tried.
 
 ```
 
