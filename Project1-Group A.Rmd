@@ -209,5 +209,17 @@ library(ggplot2)
 digital_dropna<-digital_tb_unnest %>% drop_na(ad_spend_usd) %>% drop_na(ad_impressions)
 g<-ggplot(digital_dropna, aes(x=ad_spend_usd, y=conversion_rate))
 g+geom_point()
+#some really big outliers  . ..
+```
+```{r}
+g2<-ggplot(digital_dropna,aes(x=placements))
+g2+geom_bar()
+#labels too long
+```
+```{r}
+g3<-ggplot(digital_dropna, aes(x=as.factor(year), y=ad_spend_usd))
+g3+geom_boxplot()
+#getting this error:
+#Error in order(y) : unimplemented type 'list' in 'orderVector1'
 ```
 
