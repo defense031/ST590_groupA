@@ -188,18 +188,66 @@ digital_tb %>% dplyr::mutate(location_categories = as.character(location_categor
 
 # To break out ‘categories’ list columns and create one row for each value, we can use ‘unnest()’ function from tidyr package.
 
-# unnest the first 2 columns
-digital_tb_unnest <- digital_tb %>% unnest(language_categories, .drop = FALSE) %>% unnest(placement_categories, .drop = FALSE)
-
-digital_tb_unnest$language_categories
+# unnest 4 columns using stepwise approach. .drop = FALSE keeps other lsit columns that have not been unnested yet in the process.
+digital_tb_unnest_noempty <- digital_tb %>% unnest(language_categories, .drop = FALSE) %>% unnest(placement_categories, .drop = FALSE) %>% unnest(interests_categories, .drop = FALSE) %>% unnest(location_categories, .drop = FALSE)
 
 # Unnested columns are at the end of the dataset
 
-# Because the 3rd and 4th columns contain character(0), i.e. empty data points, these 2 columns can't be unnested by default unnest(). Otherwise, it drop all the rows with empty data points.
+dim(digital_tb_unnest_noempty)
 
-# We can use the regex version of interests and locations_categories, and use detect string functions for aggregation
-# or try to unnest the rows without empty points and left join back to the mother dataset digital_tb
-# More to be tried.
+# Checking dimension, there are 1803 observations, which is less than 3517 from the original parsed dataset. This is due to 3rd and 4th columns containing character(0), i.e. character array with 0 length, these 2 columns can't be unnested by default unnest(). Otherwise, it drop all the rows with 1 or more empty data points in those list columns.
+
+# We can use the _regex version of interests_categories and locations_categories, then use detect string functions for aggregation
+
+# Or try to unnest the rows without empty points and join back to the master dataset. This seems to be a more holistic solution.
+
+# Check if ad_id is unique
+sum(table(digital_tb$ad_id)!=1)
+
+# returns 0. ad_id can theoretically serve as a join key
+
+# Wait!
+sum(is.na(digital_tb$ad_id))
+# unfortunately, there are 151 NAs in ad_id. Let's create our own row_id.
+
+digital_tb <- digital_tb %>% mutate(own_id = rownames(digital_tb)) %>% select(own_id, everything())
+
+# Grab language_categories list column and own_id, unnest it, assign it to table_inter1.
+# unnest() by default will remove empty points character(0), but explicitly filtering first would result in faster execution. It probably does not matter in this case.
+# Also, be aware that lengths() is different from length(). lengths() checks the length of each element of the list column
+table_inter1 <- digital_tb %>% select(language_categories, own_id) %>% filter(lengths(language_categories) > 0) %>% unnest()
+
+# If the unnest works properly, there should be a row for each value in the vectors.
+# Check if the number of rows of table_inter1 is equal to the sum of array elements.
+sum(lengths(digital_tb$language_categories)) == dim(table_inter1)[1]
+
+# TRUE. We are good. Apply the same method to the other 3 columns.
+table_inter2 <- digital_tb %>% select(placement_categories, own_id) %>% filter(lengths(placement_categories) > 0) %>% unnest()
+
+table_inter3 <- digital_tb %>% select(interests_categories, own_id) %>% filter(lengths(interests_categories) > 0) %>% unnest()
+
+table_inter4 <- digital_tb %>% select(location_categories, own_id) %>% filter(lengths(location_categories) > 0) %>% unnest()
+
+# Left table is master. Right table is the table of unnested column and own_id.
+digital_fully_unnest <- digital_tb %>% left_join(table_inter1, by = "own_id") %>% left_join(table_inter2, by = "own_id") %>% left_join(table_inter3, by = "own_id") %>% left_join(table_inter4, by = "own_id")
+
+# It works. The resulting tibble is fully unnested. Rows are duplicated properly for each unique combination of category values. 
+
+# Remove the list columns (.x suffix) from the original left table and put freshly joined columns (.y suffix) at front.
+df <- digital_fully_unnest %>% select(-ends_with('.x'), -own_id) %>% select(ends_with('.y'), everything())
+colnames(df) = gsub(".y", "", colnames(df))
+
+# Use df for further analysis
+
+```
+
+## Exploratory Analysis
+```{r}
+# Warning!!!!
+# since data is now fully unnested, the data (e.g. ad spend) of an ad would repeat itself for each unique combination of category values. We need to becareful about double counting.
+
+# For example
+df %>% filter(ad_id == 1147) %>% select(ends_with("categories"), ad_spend_usd)
 
 ```
 
