@@ -155,7 +155,7 @@ ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(g
 ```
 
 ## Group D ("Amanda, Adil & Brian") - Project 1b:
-## Reading JSON Data:
+## Reading JSON  and wrangling:
 ```{r Read}
 library(jsonlite)
 library(dplyr)
@@ -238,6 +238,14 @@ df <- digital_fully_unnest %>% select(-ends_with('.x'), -own_id) %>% select(ends
 colnames(df) = gsub(".y", "", colnames(df))
 
 # Use df for further analysis
+
+```
+
+## Alternative (Placeholder)
+```{r MoreUnnestingf}
+# Creating a version of dataframe to further unnest the 3rd and 4th columns without losing viable data.  The idea of unesting without empty columns and then left joining afterward may not work ad thedata types will be different between the new data set and the mother dataset digital_tb.  More testing to floow.
+digital_tb_unnestV2 <- digital_tb_unnest %>% unnest(interests_categories, .drop = FALSE)
+dplyr::left_join(digital_tb_unnest,digital_tb_unnestV2,by="interests_categories")
 
 ```
 
