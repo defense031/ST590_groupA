@@ -244,8 +244,8 @@ colnames(df) = gsub(".y", "", colnames(df))
 ## Alternative (Placeholder)
 ```{r MoreUnnestingf}
 # Creating a version of dataframe to further unnest the 3rd and 4th columns without losing viable data.  The idea of unesting without empty columns and then left joining afterward may not work ad thedata types will be different between the new data set and the mother dataset digital_tb.  More testing to floow.
-digital_tb_unnestV2 <- digital_tb_unnest %>% unnest(interests_categories, .drop = FALSE)
-dplyr::left_join(digital_tb_unnest,digital_tb_unnestV2,by="interests_categories")
+#digital_tb_unnestV2 <- digital_tb_unnest %>% unnest(interests_categories, .drop = FALSE)
+#dplyr::left_join(digital_tb_unnest,digital_tb_unnestV2,by="interests_categories")
 
 ```
 
@@ -324,4 +324,17 @@ g3+geom_boxplot()
 #getting this error:
 #Error in order(y) : unimplemented type 'list' in 'orderVector1'
 ```
+```{r Business}
+# Trying to figure out if the number of clicks contributes to the effectiveness of the ad campaigns.  In other words, does the number of ad clicks correlate to the conversion rate
+# First Creating a subset of df calling it dfEffective
+dfEffective <- df %>% select(ad_clicks, conversion_rate)
+#Plotting the two numeric variables and adding a regression line 
+g<-ggplot(dfEffective, aes(x=ad_clicks, y=conversion_rate))
+g + geom_point() + geom_smooth(method='lm',formula=y~x)
+# Visual suggests there is an association between the two variables, not necessarily causation.  Further analysis and optimization could show how much variance of the conversion rate can be explaied by the number of ad click.
+
+
+
+```
+
 
