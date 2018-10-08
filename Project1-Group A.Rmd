@@ -283,8 +283,8 @@ summary_locations_interests <- df %>% group_by(location_categories, interests_ca
 library(ggplot2)
 #to look at conversion rate by interest category
 conver_rate_by_cat<- df %>% group_by(interests_categories_regex) %>% distinct(ad_id, .keep_all = TRUE)
-g<-ggplot(summary_interests, aes(x=interests_categories, y=total_spend_usd))
-g+geom_point()
+g<-ggplot(summary_locations_interests, aes(x=interests_categories, y=average_efficien_impressions))
+g + geom_point(aes(col=location_categories))
 #how do we deal with the label names being too cluttered?  . ..
 ```
 ```{r}
