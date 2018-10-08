@@ -155,19 +155,19 @@ ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(g
 ```
 
 #Second example
-##This dataset is contains information on the effectiveness and placement of Russian ads
-## Reading JSON and wrangling:
+####This dataset is contains information on the effectiveness and placement of Russian ads
+#### Reading JSON and wrangling:
 
-##Load additional libraries
+####Load additional libraries
 ```{r}
 library(dplyr)
 library(tidyr)
 ```
-##Read in the json file
+####Read in the json file
 ```{r Read}
 ## Group D ("Amanda, Adil & Brian") - Project 1b:
 digital <- fromJSON("https://www4.stat.ncsu.edu/~post/558/datasets/russian_ads.json", flatten = TRUE)
-str(digital)
+
 
 # As you look closer you would notice the first 4 columns (variables) are ‘list’ data type and they are ‘nested’. This is because each ‘categories’ columns include an JS array data object in the original JSON data.
 # For Example (Look at the middle bracket[])
@@ -287,8 +287,6 @@ summary_locations_interests
 ```
 
 ```{r}
-# attempt at some aggregation
-library(ggplot2)
 # Mean conversion rate by interest category
 conver_rate_by_cat<- df %>% group_by(interests_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
 
@@ -311,37 +309,25 @@ knitr::kable(mean_conversions_placement)
 
 ```
 
-```{r}
+```{r, warning= FALSE}
 # Count of ads in each interest category broken by location category
 distinct_summary_locations_interests <- df %>% group_by(location_categories, interests_categories) %>% distinct(own_id, .keep_all = TRUE)
 
 g2<-ggplot(distinct_summary_locations_interests,aes(x=interests_categories))
-g2+geom_bar(aes(fill = as.factor(location_categories)))+coord_flip()
+g2+geom_bar(aes(fill = as.factor(location_categories)))+coord_flip() + labs(x = "Interest Categories", y = "Count", title = "Interest Categories by Location") + scale_fill_discrete(name = "Location")
 
 g3<-ggplot(distinct_summary_locations_interests, aes(x=location_categories, y=efficien_impressions))
-g3+geom_boxplot()
-
-#how do you guys feel about removing the NA's?  
-#distinct_summary_locations_interests <- df %>% group_by(location_categories, interests_categories) %>% distinct(own_id, .keep_all = TRUE) %>% drop_na(location_categories) %>% drop_na(interests_categories) 
-
-#the graph below is with NA removed from both variables
-
-#getting this error:
-#Error in order(y) : unimplemented type 'list' in 'orderVector1'
-# error fixed, but there are some abnormal efficient impressions in unidentified location categories (NA) 
+g3+geom_boxplot() + labs(x = "Location Categories", y = "Impressions", title = "Impressions by Location")
 
 ```
-```{r Business}
+```{r Business, warning = FALSE}
 # Trying to figure out if the number of clicks contributes to the effectiveness of the ad campaigns.  In other words, does the number of ad clicks correlate to the conversion rate
 # First Creating a subset of df calling it dfEffective
 dfEffective <- df %>% select(ad_clicks, conversion_rate)
 #Plotting the two numeric variables and adding a regression line 
 g<-ggplot(dfEffective, aes(x=ad_clicks, y=conversion_rate))
-g + geom_point() + geom_smooth(method='lm',formula=y~x)
-# Visual suggests there is an association between the two variables, not necessarily causation.  Further analysis and optimization could show how much variance of the conversion rate can be explaied by the number of ad click.
-
-
-
+g + geom_point() + geom_smooth(method='lm',formula=y~x) + labs(x="Ad Clicks", y = "Conversion Rate", title = "Conversion Rate by Number of Clicks")
+# Visual suggests there is an association between the two variables, not necessarily causation.  Further analysis and optimization could show how much variance of the conversion rate can be explained by the number of ad clicks.
 ```
 
 
