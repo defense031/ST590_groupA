@@ -155,7 +155,7 @@ ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(g
 ```
 
 ## Group D ("Amanda, Adil & Brian") - Project 1b:
-## Reading JSON  and wrangling:
+## Reading JSON and wrangling:
 ```{r Read}
 library(jsonlite)
 library(dplyr)
