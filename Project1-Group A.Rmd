@@ -154,12 +154,18 @@ ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(g
 
 ```
 
-## Group D ("Amanda, Adil & Brian") - Project 1b:
+#Second example
+##This dataset is contains information on the effectiveness and placement of Russian ads
 ## Reading JSON and wrangling:
-```{r Read}
-library(jsonlite)
+
+##Load additional libraries
+```{r}
 library(dplyr)
 library(tidyr)
+```
+##Read in the json file
+```{r Read}
+## Group D ("Amanda, Adil & Brian") - Project 1b:
 digital <- fromJSON("https://www4.stat.ncsu.edu/~post/558/datasets/russian_ads.json", flatten = TRUE)
 str(digital)
 
@@ -285,6 +291,7 @@ summary_locations_interests
 library(ggplot2)
 # Mean conversion rate by interest category
 conver_rate_by_cat<- df %>% group_by(interests_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
+
 g <- ggplot(conver_rate_by_cat, aes(x=interests_categories, y=mean_conversion_rate))
 g + geom_point() + coord_flip()
 
@@ -313,6 +320,11 @@ g2+geom_bar(aes(fill = as.factor(location_categories)))+coord_flip()
 
 g3<-ggplot(distinct_summary_locations_interests, aes(x=location_categories, y=efficien_impressions))
 g3+geom_boxplot()
+
+#how do you guys feel about removing the NA's?  
+#distinct_summary_locations_interests <- df %>% group_by(location_categories, interests_categories) %>% distinct(own_id, .keep_all = TRUE) %>% drop_na(location_categories) %>% drop_na(interests_categories) 
+
+#the graph below is with NA removed from both variables
 
 #getting this error:
 #Error in order(y) : unimplemented type 'list' in 'orderVector1'
