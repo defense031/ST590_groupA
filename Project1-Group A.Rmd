@@ -188,14 +188,14 @@ digital_tb %>% dplyr::mutate(location_categories = as.character(location_categor
 
 # To break out ‘categories’ list columns and create one row for each value, we can use ‘unnest()’ function from tidyr package.
 
-# unnest 4 columns using stepwise approach. .drop = FALSE keeps other lsit columns that have not been unnested yet in the process.
+# unnest 4 columns using stepwise approach. .drop = FALSE keeps other list columns that have not been unnested yet in the process.
 digital_tb_unnest_noempty <- digital_tb %>% unnest(language_categories, .drop = FALSE) %>% unnest(placement_categories, .drop = FALSE) %>% unnest(interests_categories, .drop = FALSE) %>% unnest(location_categories, .drop = FALSE)
 
 # Unnested columns are at the end of the dataset
 
 dim(digital_tb_unnest_noempty)
 
-# Checking dimension, there are 1803 observations, which is less than 3517 from the original parsed dataset. This is due to 3rd and 4th columns containing character(0), i.e. character array with 0 length, these 2 columns can't be unnested by default unnest(). Otherwise, it drop all the rows with 1 or more empty data points in those list columns.
+# Checking dimension, there are 1803 observations, which is less than 3517 from the original parsed dataset. This is due to 3rd and 4th columns containing character(0), i.e. character array with 0 length, these 2 columns can't be unnested by default unnest(). Otherwise, it will drop all the rows with 1 or more empty data points in those list columns.
 
 # We can use the _regex version of interests_categories and locations_categories, then use detect string functions for aggregation
 
@@ -261,7 +261,7 @@ df %>% filter(ad_id == 1147) %>% select(ends_with("categories"), ad_spend_usd)
 
 # For example, summarize using only interests. Get the unique data for the interest group first.
 # .keep_all = TRUE retains all other columns associated to the unique ad.
-int_summary_interests <- df %>% select() group_by(interests_categories) %>% distinct(ad_id, .keep_all = TRUE)
+int_summary_interests <- df %>% group_by(interests_categories) %>% distinct(ad_id, .keep_all = TRUE)
 
 # Check to see if this mindset works
 int_summary_interests %>% filter(ad_id == 1147)
@@ -279,20 +279,20 @@ summary_locations_interests <- df %>% group_by(location_categories, interests_ca
 ```
 
 ```{r}
-#first attempt at some aggregation
+# attempt at some aggregation
 library(ggplot2)
-digital_dropna<-digital_tb_unnest %>% drop_na(ad_spend_usd) %>% drop_na(ad_impressions)
-g<-ggplot(digital_dropna, aes(x=ad_spend_usd, y=conversion_rate))
+#to look at conversion rate by interest category
+conver_rate_by_cat<- df %>% group_by(interests_categories_regex) %>% distinct(ad_id, .keep_all = TRUE)
+g<-ggplot(summary_interests, aes(x=interests_categories, y=total_spend_usd))
 g+geom_point()
-#some really big outliers  . ..
+#how do we deal with the label names being too cluttered?  . ..
 ```
 ```{r}
-g2<-ggplot(digital_dropna,aes(x=placements))
+g2<-ggplot(summary_locations_interests,aes(x=location_categories))
 g2+geom_bar()
-#labels too long
 ```
 ```{r}
-g3<-ggplot(digital_dropna, aes(x=as.factor(year), y=ad_spend_usd))
+g3<-ggplot(summary_locations_interests, aes(x=location_categories, y=average_efficien_impressions))
 g3+geom_boxplot()
 #getting this error:
 #Error in order(y) : unimplemented type 'list' in 'orderVector1'
