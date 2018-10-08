@@ -257,6 +257,25 @@ dplyr::left_join(digital_tb_unnest,digital_tb_unnestV2,by="interests_categories"
 # For example
 df %>% filter(ad_id == 1147) %>% select(ends_with("categories"), ad_spend_usd)
 
+# To avoid the problem of double counting in aggregation analysis that involves a subset of categories, pull the distinct rows (in this case ads) of each group.
+
+# For example, summarize using only interests. Get the unique data for the interest group first.
+# .keep_all = TRUE retains all other columns associated to the unique ad.
+int_summary_interests <- df %>% select() group_by(interests_categories) %>% distinct(ad_id, .keep_all = TRUE)
+
+# Check to see if this mindset works
+int_summary_interests %>% filter(ad_id == 1147)
+
+# It shows only 2 rows associated to ad_id 1147 becasue 1147 has only 2 interest categories, instead of 8 rows in the comprehensive df. This is the result we want. Now we can do a summarization such as total amount spent in each interest category
+summary_interests <- int_summary_interests %>% summarize(total_spend_usd = sum(ad_spend_usd, na.rm = TRUE))
+# You can summarize other columns in sum(), mean(), count(), etc by changing the above line.
+
+# Another example, summarize using 2 categories, location and interests. 
+# Doing it in 1 line
+summary_locations_interests <- df %>% group_by(location_categories, interests_categories) %>% distinct(ad_id, .keep_all = TRUE) %>% summarize(average_efficien_impressions = mean(efficien_impressions, na.rm = TRUE))
+
+# From now on, you can analyze anything you want with flexibility using the unnested data structure.
+
 ```
 
 ```{r}
