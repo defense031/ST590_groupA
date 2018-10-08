@@ -291,18 +291,15 @@ summary_locations_interests
 conver_rate_by_cat<- df %>% group_by(interests_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
 
 g <- ggplot(conver_rate_by_cat, aes(x=interests_categories, y=mean_conversion_rate))
-g + geom_point() + coord_flip()
-
-# How do we deal with the label names being too cluttered? 
-# + coord_flip() can put the categories in y axis, which results in more space.
+g + geom_point() + coord_flip() + labs(x= "Interest Categories", y = "Mean Conversion Rate", title = "Mean Conversion Rate by Interest")
 
 # Mean conversion by region
 mean_conversions_region<- df %>% group_by(location_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
 g4<-ggplot(mean_conversions_region, aes(x=location_categories, y=mean_conversion_rate))
-g4 + geom_point()
+g4 + geom_point()+labs(x= "Region", y = "Mean Conversion Rate", title = "Mean Conversion Rate by Region")
 
 # Mean conversion by placement media
-mean_conversions_placement<- df %>% group_by(placement_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE)) %>% arrange(mean_conversion_rate)
+mean_conversions_placement<- df %>% group_by(placement_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE)) %>% arrange(mean_conversion_rate) 
 
 #this may be more appropriate for a table.  proably should limit it to top ten.  can also do this for impressions and maybe by add #
 knitr::kable(mean_conversions_placement)
@@ -314,10 +311,10 @@ knitr::kable(mean_conversions_placement)
 distinct_summary_locations_interests <- df %>% group_by(location_categories, interests_categories) %>% distinct(own_id, .keep_all = TRUE)
 
 g2<-ggplot(distinct_summary_locations_interests,aes(x=interests_categories))
-g2+geom_bar(aes(fill = as.factor(location_categories)))+coord_flip() + labs(x = "Interest Categories", y = "Count", title = "Interest Categories by Location") + scale_fill_discrete(name = "Location")
+g2+geom_bar(aes(fill = as.factor(location_categories)))+coord_flip() + labs(x = "Interest Categories", y = "Count", title = "Interest Categories by Region") + scale_fill_discrete(name = "Region")
 
 g3<-ggplot(distinct_summary_locations_interests, aes(x=location_categories, y=efficien_impressions))
-g3+geom_boxplot() + labs(x = "Location Categories", y = "Impressions", title = "Impressions by Location")
+g3+geom_boxplot() + labs(x = "Location Categories", y = "Impressions", title = "Impressions by Region")
 
 ```
 ```{r Business, warning = FALSE}
