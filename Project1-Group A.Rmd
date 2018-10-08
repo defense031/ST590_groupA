@@ -155,7 +155,7 @@ ggplot(Pokedf, aes(x = (as.numeric(gsub("kg","",Pokedf[,7]))), y = (as.numeric(g
 ```
 
 ## Group D ("Amanda, Adil & Brian") - Project 1b:
-## Reading JSON  and wrangling:
+## Reading JSON and wrangling:
 ```{r Read}
 library(jsonlite)
 library(dplyr)
@@ -234,14 +234,14 @@ digital_fully_unnest <- digital_tb %>% left_join(table_inter1, by = "own_id") %>
 # It works. The resulting tibble is fully unnested. Rows are duplicated properly for each unique combination of category values. 
 
 # Remove the list columns (.x suffix) from the original left table and put freshly joined columns (.y suffix) at front.
-df <- digital_fully_unnest %>% select(-ends_with('.x'), -own_id) %>% select(ends_with('.y'), everything())
+df <- digital_fully_unnest %>% select(-ends_with('.x')) %>% select(ends_with('.y'), everything())
 colnames(df) = gsub(".y", "", colnames(df))
 
 # Use df for further analysis
 
 ```
 
-## Alternative (Placeholder)
+## Alternative Method to fix list columns (Placeholder)
 ```{r MoreUnnestingf}
 # Creating a version of dataframe to further unnest the 3rd and 4th columns without losing viable data.  The idea of unesting without empty columns and then left joining afterward may not work ad thedata types will be different between the new data set and the mother dataset digital_tb.  More testing to floow.
 #digital_tb_unnestV2 <- digital_tb_unnest %>% unnest(interests_categories, .drop = FALSE)
@@ -261,18 +261,20 @@ df %>% filter(ad_id == 1147) %>% select(ends_with("categories"), ad_spend_usd)
 
 # For example, summarize using only interests. Get the unique data for the interest group first.
 # .keep_all = TRUE retains all other columns associated to the unique ad.
-int_summary_interests <- df %>% group_by(interests_categories) %>% distinct(ad_id, .keep_all = TRUE)
+int_summary_interests <- df %>% group_by(interests_categories) %>% distinct(own_id, .keep_all = TRUE)
 
 # Check to see if this mindset works
 int_summary_interests %>% filter(ad_id == 1147)
 
 # It shows only 2 rows associated to ad_id 1147 becasue 1147 has only 2 interest categories, instead of 8 rows in the comprehensive df. This is the result we want. Now we can do a summarization such as total amount spent in each interest category
 summary_interests <- int_summary_interests %>% summarize(total_spend_usd = sum(ad_spend_usd, na.rm = TRUE))
+summary_interests
 # You can summarize other columns in sum(), mean(), count(), etc by changing the above line.
 
 # Another example, summarize using 2 categories, location and interests. 
 # Doing it in 1 line
-summary_locations_interests <- df %>% group_by(location_categories, interests_categories) %>% distinct(ad_id, .keep_all = TRUE) %>% summarize(average_efficien_impressions = mean(efficien_impressions, na.rm = TRUE))
+summary_locations_interests <- df %>% group_by(location_categories, interests_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarize(average_efficien_impressions = mean(efficien_impressions, na.rm = TRUE))
+summary_locations_interests
 
 # From now on, you can analyze anything you want with flexibility using the unnested data structure.
 
@@ -281,48 +283,41 @@ summary_locations_interests <- df %>% group_by(location_categories, interests_ca
 ```{r}
 # attempt at some aggregation
 library(ggplot2)
-#to look at conversion rate by interest category
-conver_rate_by_cat<- df %>% group_by(interests_categories_regex) %>% distinct(ad_id, .keep_all = TRUE)
-g<-ggplot(summary_locations_interests, aes(x=interests_categories, y=average_efficien_impressions))
-g + geom_point(aes(col=location_categories))
-#how do we deal with the label names being too cluttered?  . ..
+# Mean conversion rate by interest category
+conver_rate_by_cat<- df %>% group_by(interests_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
+g <- ggplot(conver_rate_by_cat, aes(x=interests_categories, y=mean_conversion_rate))
+g + geom_point() + coord_flip()
 
-#mean conversion by region
-mean_conversions_region<- df %>% group_by(location_categories) %>% distinct(ad_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
+# How do we deal with the label names being too cluttered? 
+# + coord_flip() can put the categories in y axis, which results in more space.
 
-mean_conversions_placement<- df %>% group_by(placements) %>% distinct(ad_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE)) %>% arrange(mean_conversion_rate)
-
-library(ggplot2)
+# Mean conversion by region
+mean_conversions_region<- df %>% group_by(location_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
 g4<-ggplot(mean_conversions_region, aes(x=location_categories, y=mean_conversion_rate))
 g4 + geom_point()
-```
 
-```{r}
-#mean conversion by region
-mean_conversions_region<- df %>% group_by(location_categories) %>% distinct(ad_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
-g4<-ggplot(mean_conversions_region, aes(x=location_categories, y=mean_conversion_rate))
-g4 + geom_point()
-```
-```{r}
-#mean conversions by placement
-mean_conversions_placement<- df %>% group_by(placements) %>% distinct(ad_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE)) %>% arrange(mean_conversion_rate)
+# Mean conversion by placement media
+mean_conversions_placement<- df %>% group_by(placement_categories) %>% distinct(own_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE)) %>% arrange(mean_conversion_rate)
 
 #this may be more appropriate for a table.  proably should limit it to top ten.  can also do this for impressions and maybe by add #
 knitr::kable(mean_conversions_placement)
 
-
-
 ```
 
 ```{r}
-g2<-ggplot(summary_locations_interests,aes(x=location_categories))
-g2+geom_bar()
-```
-```{r}
-g3<-ggplot(summary_locations_interests, aes(x=location_categories, y=average_efficien_impressions))
+# Count of ads in each interest category broken by location category
+distinct_summary_locations_interests <- df %>% group_by(location_categories, interests_categories) %>% distinct(own_id, .keep_all = TRUE)
+
+g2<-ggplot(distinct_summary_locations_interests,aes(x=interests_categories))
+g2+geom_bar(aes(fill = as.factor(location_categories)))+coord_flip()
+
+g3<-ggplot(distinct_summary_locations_interests, aes(x=location_categories, y=efficien_impressions))
 g3+geom_boxplot()
+
 #getting this error:
 #Error in order(y) : unimplemented type 'list' in 'orderVector1'
+# error fixed, but there are some abnormal efficient impressions in unidentified location categories (NA) 
+
 ```
 ```{r Business}
 # Trying to figure out if the number of clicks contributes to the effectiveness of the ad campaigns.  In other words, does the number of ad clicks correlate to the conversion rate
