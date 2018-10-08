@@ -286,7 +286,34 @@ conver_rate_by_cat<- df %>% group_by(interests_categories_regex) %>% distinct(ad
 g<-ggplot(summary_locations_interests, aes(x=interests_categories, y=average_efficien_impressions))
 g + geom_point(aes(col=location_categories))
 #how do we deal with the label names being too cluttered?  . ..
+
+#mean conversion by region
+mean_conversions_region<- df %>% group_by(location_categories) %>% distinct(ad_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
+
+mean_conversions_placement<- df %>% group_by(placements) %>% distinct(ad_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE)) %>% arrange(mean_conversion_rate)
+
+library(ggplot2)
+g4<-ggplot(mean_conversions_region, aes(x=location_categories, y=mean_conversion_rate))
+g4 + geom_point()
 ```
+
+```{r}
+#mean conversion by region
+mean_conversions_region<- df %>% group_by(location_categories) %>% distinct(ad_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE))
+g4<-ggplot(mean_conversions_region, aes(x=location_categories, y=mean_conversion_rate))
+g4 + geom_point()
+```
+```{r}
+#mean conversions by placement
+mean_conversions_placement<- df %>% group_by(placements) %>% distinct(ad_id, .keep_all = TRUE) %>% summarise(mean_conversion_rate = mean(conversion_rate, na.rm = TRUE)) %>% arrange(mean_conversion_rate)
+
+#this may be more appropriate for a table.  proably should limit it to top ten.  can also do this for impressions and maybe by add #
+knitr::kable(mean_conversions_placement)
+
+
+
+```
+
 ```{r}
 g2<-ggplot(summary_locations_interests,aes(x=location_categories))
 g2+geom_bar()
